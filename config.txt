@@ -1,0 +1,1 @@
+{"items":"#j_nav56261_list","item":"#j_nav56261_list \u003e section:nth-child(2)","url":"https://news.sina.cn/gn/?from\u003dwrap","content":"html \u003e body.article_body \u003e main.page_main.fl_padding \u003e section.j_main_art \u003e section.s_card.z_c1 \u003e article.art_box \u003e section.art_pic_card.art_content"}
