@@ -15,6 +15,7 @@ import org.jsoup.nodes.Element;
 import org.junit.Test;
 
 import com.google.gson.Gson;
+import com.jayway.jsonpath.JsonPath;
 import com.wanfangdata.gne.bean.ExtractBean;
 import com.wanfangdata.gne.extract.AuthorExtractor;
 import com.wanfangdata.gne.extract.ContentExtractor;
@@ -112,7 +113,7 @@ public class App {
 		System.out.println(System.currentTimeMillis() - start);
 	}
 
-	@Test
+//	@Test
 	public void testP() {
 		String url = "http://gongyi.hebnews.cn/";
 
@@ -120,5 +121,12 @@ public class App {
 		Document doc = Jsoup.parse(test);
 		String attr = doc.selectFirst(".dis").cssSelector();
 		System.out.println(attr);
+	}
+	
+	@Test
+	public void testJson() {
+		String test = "{\"test\":\"aaaa\"}";
+		String result = JsonPath.read(test, "$.test");
+		System.out.print(result);
 	}
 }

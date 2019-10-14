@@ -32,7 +32,6 @@ public class ListExtractor {
 			doc.setBaseUri(getDomain(url));
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	if(extractBean.getItem()!=null) {
@@ -78,6 +77,11 @@ public class ListExtractor {
 		}
 	}
 
+	/**
+	 * 选择文本长度最大的ele
+	 * @param eles
+	 * @return
+	 */
 	private Element findMax(Set<Element> eles) {
 		Element result = null;
 		for(Element ele:eles) {
@@ -93,23 +97,26 @@ public class ListExtractor {
 
 	/**
 	 * 子元素大于10,且标签相同，有a孙元素, a孙元素文本>4
+	 * 递归查找list 集合
 	 * @param ele
 	 */
 	public void findList(Element ele) {
 		if (ele.children() != null) {
-
 			if (ele.children().size() >= MAXCHILD) {
+				
 				Element grandChild = ele.child(1);
 				String tag = grandChild.tagName();
 				String selector;
-				Set<String> grandClassSet = grandChild.classNames();
-				if(grandClassSet!=null && grandClassSet.size()>0) {
-					String grandClass = grandClassSet.iterator().next();
-					selector = ele.tagName() + " > "+ tag + "." +grandClass;
-				}else {
-					selector = ele.tagName() + " > "+ tag;
+//				Set<String> grandClassSet = grandChild.classNames();
+//				if(grandClassSet!=null && grandClassSet.size()>0) {
+//					String grandClass = grandClassSet.iterator().next();
+//					selector = ele.cssSelector() + " > "+ tag;
+//				}else 
+				{
+					selector = ele.cssSelector() + " > "+ tag;
 				}
-				if (ele.select(selector).size() >= MAXCHILD && grandChild.select(grandChild.tagName() + " a") != null && grandChild.select(grandChild.tagName() + " a").text().length()>4) {
+				// item 下有a标签,并且a标签文本长度>4 或有img
+				if (ele.select(selector).size() >= MAXCHILD && grandChild.select(grandChild.tagName() + " a") != null && (grandChild.select(grandChild.tagName() + " a").text().length()>4 || grandChild.select(grandChild.tagName() + " a>img")!=null)) {
 					eles.add(ele);
 //					findHref(ele, tag);
 //					if (urls.size() >= MAXCHILD) {
