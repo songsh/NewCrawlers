@@ -1,4 +1,4 @@
-package com.wanfangdata.gne.extract;
+package com.wanfangdata.gne.extract.abs;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,26 +9,19 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.wanfangdata.gne.bean.ExtractBean;
+import com.wanfangdata.gne.extract.factory.Extractor;
 
-public class TitleExtractor {
+public abstract class TitleExtractor implements Extractor{
 
 	public static final String[] patterns = {"title","h1", "h2", "h3"};
-	private ExtractBean extractBean;
+	
+	protected ExtractBean extractBean;
 
 	public TitleExtractor(ExtractBean bean) {
 		this.extractBean = bean;
 	}
 	
-	public void extract(Element ele) {
-		String result;
-		if(extractBean.getTitle() !=null) {
-			result = ele.selectFirst(extractBean.getTitle()).text();
-		}else {
-			result = extractByAuto(ele);
-		}
-		System.out.println(result);
-		return;
-	}
+	public abstract void extract(Element ele);
 
 	public String extractByAuto(Element ele) {
 		String result = extractByMeta(ele);
@@ -38,6 +31,7 @@ public class TitleExtractor {
 		}
 		return result;
 	}
+	
 	public void extract(Element ele, String pattern) {
 		String result = extractByPattern(ele,pattern);
 		if(result == null || "".equals(result)) {

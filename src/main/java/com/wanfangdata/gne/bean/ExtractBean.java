@@ -9,6 +9,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.google.gson.Gson;
 
@@ -22,7 +24,7 @@ public class ExtractBean {
 	private String content;
 
 	public static ExtractBean parse(String url) {
-		File file = new File(url.hashCode()+".txt");
+		File file = new File(getFilename(url)+".txt");
 		if(file.exists()) {
 			StringBuffer sb = new StringBuffer();
 			BufferedReader br;
@@ -109,13 +111,13 @@ public class ExtractBean {
 				+ author + ", date=" + date + ", content=" + content + "]";
 	}
 
-	public void writeToFile() {
+	public void writeToFile(String url) {
 		Gson gson = new Gson();
 		String json = gson.toJson(this);
 		OutputStream os = null;
 		PrintWriter pw = null;
 		try {
-			File file = new File(this.url.hashCode()+".txt");
+			File file = new File(getFilename(url)+".txt");
 			System.out.println(file.getAbsoluteFile());
 			if (!file.exists()) {
 				file.createNewFile();
@@ -130,6 +132,19 @@ public class ExtractBean {
 
 		}
 
+	}
+	
+	public static String getFilename(String url) {
+		
+		URI uri;
+		try {
+			uri = new URI(url);
+			String domain = uri.getHost() + (uri.getPort()==-1?"":uri.getPort());
+			return domain;
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 
 }

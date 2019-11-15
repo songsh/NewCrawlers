@@ -1,11 +1,21 @@
-package com.wanfangdata.gne.extract;
+package com.wanfangdata.gne.extract.abs;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Element;
 
-public class DateExtractor {
+import com.wanfangdata.gne.bean.ExtractBean;
+import com.wanfangdata.gne.extract.factory.Extractor;
+
+public abstract class DateExtractor implements Extractor{
+
+	protected ExtractBean extractBean;
+
+	public DateExtractor(ExtractBean bean) {
+		this.extractBean = bean;
+	}
+	
 	public static final String[] patterns = {
 			"(\\d{4}[-|/|.]\\d{1,2}[-|/|.]\\d{1,2}\\s*?[0-1]?[0-9]:[0-5]?[0-9]:[0-5]?[0-9])",
 			"(\\d{4}[-|/|.]\\d{1,2}[-|/|.]\\d{1,2}\\s*?[2][0-3]:[0-5]?[0-9]:[0-5]?[0-9])",
@@ -34,16 +44,5 @@ public class DateExtractor {
 			"(\\d{2}[-|/|.]\\d{1,2}[-|/|.]\\d{1,2})", "(\\d{4}年\\d{1,2}月\\d{1,2}日)", "(\\d{2}年\\d{1,2}月\\d{1,2}日)",
 			"(\\d{1,2}月\\d{1,2}日)" };
 
-	public void extract(Element ele) {
-		String content = ele.text();
-		for(int i=0;i<patterns.length;i++) {
-			Pattern compile = Pattern.compile(patterns[i]);
-			Matcher matcher = compile.matcher(content);
-			if(matcher.find()) {
-				String author = matcher.group(1);
-				System.out.println(author);
-				return;
-			}
-		}
-	}
+	public abstract void extract(Element ele);
 }

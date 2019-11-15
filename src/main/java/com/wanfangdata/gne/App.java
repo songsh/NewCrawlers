@@ -17,11 +17,12 @@ import org.junit.Test;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import com.wanfangdata.gne.bean.ExtractBean;
-import com.wanfangdata.gne.extract.AuthorExtractor;
-import com.wanfangdata.gne.extract.ContentExtractor;
-import com.wanfangdata.gne.extract.DateExtractor;
-import com.wanfangdata.gne.extract.ListExtractor;
-import com.wanfangdata.gne.extract.TitleExtractor;
+import com.wanfangdata.gne.extract.abs.AuthorExtractor;
+import com.wanfangdata.gne.extract.abs.ContentExtractor;
+import com.wanfangdata.gne.extract.abs.DateExtractor;
+import com.wanfangdata.gne.extract.abs.ListExtractor;
+import com.wanfangdata.gne.extract.abs.TitleExtractor;
+import com.wanfangdata.gne.extract.factory.ExtractFactory;
 import com.wanfangdata.gne.util.HtmlUtils;
 import com.wanfangdata.gne.util.HttpUtils;
 
@@ -49,13 +50,15 @@ public class App {
 //		System.out.println(input);
 		
 		ExtractBean extractBean = ExtractBean.parse(url);
-		ListExtractor listExtractor = new ListExtractor(extractBean);
+		
+		ListExtractor listExtractor = (ListExtractor) ExtractFactory.get("list",extractBean);
+		ContentExtractor contentExtractor = (ContentExtractor) ExtractFactory.get("content",extractBean);
+		AuthorExtractor authorExtractor = (AuthorExtractor) ExtractFactory.get("author",extractBean);
+		DateExtractor dateExtractor = (DateExtractor) ExtractFactory.get("date",extractBean);
+		TitleExtractor titleExtractor = (TitleExtractor) ExtractFactory.get("title",extractBean);
+		
+		
 		Set<String> urls = listExtractor.extract(input, url);
-
-		ContentExtractor contentExtractor = new ContentExtractor(extractBean);
-		AuthorExtractor authorExtractor = new AuthorExtractor();
-		DateExtractor dateExtractor = new DateExtractor();
-		TitleExtractor titleExtractor = new TitleExtractor(extractBean);
 		for (String url2 : urls) {
 			
 			String detail = HttpUtils.doGet(url2);
@@ -72,7 +75,7 @@ public class App {
 			dateExtractor.extract(doc);
 
 		}
-		extractBean.writeToFile();
+		extractBean.writeToFile(url);
 //		System.out.println(extractBean.toString());
 		
 //		long start = System.currentTimeMillis();

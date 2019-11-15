@@ -1,4 +1,4 @@
-package com.wanfangdata.gne.extract;
+package com.wanfangdata.gne.extract.abs;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,36 +14,23 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import com.wanfangdata.gne.bean.ExtractBean;
+import com.wanfangdata.gne.extract.factory.Extractor;
 
-public class ListExtractor {
+public abstract class ListExtractor implements Extractor{
 
-	private static final int MAXCHILD = 7;
-	private Set<String> urls = new LinkedHashSet<String>();
-	private Set<Element> eles = new LinkedHashSet<Element>();
-	private ExtractBean extractBean;
+	protected static final int MAXCHILD = 7;
+	protected Set<String> urls = new LinkedHashSet<String>();
+	protected Set<Element> eles = new LinkedHashSet<Element>();
+	
+	protected ExtractBean extractBean;
 
 	public ListExtractor(ExtractBean bean) {
 		this.extractBean = bean;
 	}
-	public Set<String> extract(String content,String url) {
-		Document doc = null;
-    	try {
-			doc = Jsoup.parse(content);
-			doc.setBaseUri(getDomain(url));
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-    	if(extractBean.getItem()!=null) {
-    		extractByTag(doc);
-    	}else {
-    		extract(doc);
-    	}
-    	return urls;
-    	
-	}
 	
-	private void extractByTag(Document doc) {
+	public abstract Set<String> extract(String content,String url) ;
+	
+	protected void extractByTag(Document doc) {
 		Elements select = doc.select(extractBean.getItems() + " > " + extractBean.getItem());
 		for (Element child : select) {
 			Element childA = child.selectFirst(child.tagName()+ " a");
@@ -54,7 +41,7 @@ public class ListExtractor {
 		}
 		
 	}
-	private String getDomain(String url) {
+	protected String getDomain(String url) {
 		URI uri;
 		try {
 			uri = new URI(url);
@@ -82,7 +69,7 @@ public class ListExtractor {
 	 * @param eles
 	 * @return
 	 */
-	private Element findMax(Set<Element> eles) {
+	protected Element findMax(Set<Element> eles) {
 		Element result = null;
 		for(Element ele:eles) {
 			if(result == null) {
@@ -135,7 +122,7 @@ public class ListExtractor {
 		}
 	}
 
-	private void findHref(Element chi, String tag) {
+	protected void findHref(Element chi, String tag) {
 		Elements select = chi.select(" > " + tag);
 		
 		for (Element child : select) {

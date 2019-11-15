@@ -1,4 +1,4 @@
-package com.wanfangdata.gne.extract;
+package com.wanfangdata.gne.extract.abs;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,7 +8,17 @@ import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-public class AuthorExtractor {
+import com.wanfangdata.gne.bean.ExtractBean;
+import com.wanfangdata.gne.extract.factory.Extractor;
+
+public abstract class AuthorExtractor implements Extractor{
+	
+	protected ExtractBean extractBean;
+
+	public AuthorExtractor(ExtractBean bean) {
+		this.extractBean = bean;
+	}
+	
 	public static final String[] patterns = {"责编[：|:| |丨|/]\\s*([\\u4E00-\\u9FA5]{2,5})[^\\u4E00-\\u9FA5|:|：]",
 											"作者[：|:| |丨|/]\\s*([\\u4E00-\\u9FA5]{2,5})[^\\u4E00-\\u9FA5|:|：]",
 	                                          "编辑[：|:| |丨|/]\\s*([\\u4E00-\\u9FA5]{2,5})[^\\u4E00-\\u9FA5|:|：]",
@@ -16,20 +26,9 @@ public class AuthorExtractor {
 	                                          "记者[：|:| |丨|/]\\s*([\\u4E00-\\u9FA5]{2,5})[^\\u4E00-\\u9FA5|:|：]",
 	                                          "撰文[：|:| |丨|/]\\s*([\\u4E00-\\u9FA5]{2,5})[^\\u4E00-\\u9FA5|:|：]"};
 	
-	public void extract(Element ele) {
-		String content = ele.text();
-		String author = extracByPattern(content);
-		if(author == "") {
-			author = extractByMeta(ele);
-			if(author == "") {
-				author = extractByH(ele);
-			}
-		}
-	
-		System.out.println(author);
-	}
+	public abstract void extract(Element ele) ;
 
-	private String extracByPattern(String content) {
+	protected String extracByPattern(String content) {
 		for(int i=0;i<patterns.length;i++) {
 			Pattern compile = Pattern.compile(patterns[i]);
 			Matcher matcher = compile.matcher(content);
@@ -43,13 +42,13 @@ public class AuthorExtractor {
 	}
 	
 	// h1 存在时，H2为AUTHOR
-	private String extractByH(Element ele) {
+	protected String extractByH(Element ele) {
 		if(ele.select("h1").size()>0) {
 			return ele.select("h2").text();
 		}
 		return "";
 	}
-	private String extractByMeta(Element ele) {
+	protected String extractByMeta(Element ele) {
 		String result = "";
 		Elements select = ele.select("meta");
 		if(select!=null) {

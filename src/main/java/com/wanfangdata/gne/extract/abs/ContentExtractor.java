@@ -1,4 +1,4 @@
-package com.wanfangdata.gne.extract;
+package com.wanfangdata.gne.extract.abs;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,52 +12,22 @@ import org.jsoup.select.Elements;
 
 import com.google.gson.JsonObject;
 import com.wanfangdata.gne.bean.ExtractBean;
+import com.wanfangdata.gne.extract.factory.Extractor;
 
-public class ContentExtractor {
-	
-	private static final String punctuation = "['''！，。？；：“”‘’《》%（）,.?:;'\"!%()''']";
-	private ExtractBean extractBean;
-	
+public abstract class ContentExtractor implements Extractor{
+
+
 	public ContentExtractor(ExtractBean bean) {
 		this.extractBean = bean;
 	}
-	public void extract(Document doc) {
-		Element body = doc.select("body").get(0);
-		String result;
-		if(extractBean.getContent()!=null) {
-			result = extractByTag(doc);
-		}else {
-			List<CALCBean> list = new ArrayList();
-			for(Element ele:body.select("*")) {
-				int hash = ele.hashCode();
-				CALCBean bean = new CALCBean();
-				bean.setEle(ele);
-				calc_text_density(ele,bean);
-				
-				double sbdi = calc_sbdi(bean.getText(),bean);
-				
-				int count_text_tag = count_text_tag(ele);
-				bean.setSbdi(sbdi);
-				bean.setText_tag_count(count_text_tag);
-				list.add(bean);
-			}
-			double std = calc_std(list);
-			calc_new_score(list,std);
-			Collections.sort(list);
-			result = list.get(0).getText();
-			extractBean.setContent(list.get(0).getEle().cssSelector());
-		}
-		System.out.println("content:" + result);
-		
-	}
 	
-	private String extractByTag(Element body) {
-		Element ele = body.selectFirst(extractBean.getContent());
-		if(ele!=null) {
-			return ele.text();
-		}
-		return "";
-	}
+	protected static final String punctuation = "['''！，。？；：“”‘’《》%（）,.?:;'\"!%()''']";
+	protected ExtractBean extractBean;
+	
+	
+	public abstract void extract(Element doc) ;
+	
+	
 
 	/**
 	 * 根据公式：
@@ -72,7 +42,7 @@ public class ContentExtractor {
 	 * @param ele
 	 * @return
 	 */
-	private void calc_text_density(Element ele,CALCBean bean) {
+	protected void calc_text_density(Element ele,CALCBean bean) {
 		try {
 			String ti_text = getAllTextOfElement(ele);
 			
@@ -113,7 +83,7 @@ public class ContentExtractor {
 	 * @param lti
 	 * @return
 	 */
-	private double calc_sbdi(String text,CALCBean bean) {
+	protected double calc_sbdi(String text,CALCBean bean) {
 		int sbi = count_punctuation_num(text);
 		if(sbi < 0) {
 			sbi = 0;
@@ -128,18 +98,18 @@ public class ContentExtractor {
 	 * @param text
 	 * @return
 	 */
-	private int count_punctuation_num(String text) {
+	protected int count_punctuation_num(String text) {
 		String tmp = text.replaceAll(punctuation, "");
 		return text.length() - tmp.length();
 		
 	}
 	
-	private int count_alltext_num(String text) {
+	protected int count_alltext_num(String text) {
 		String tmp = text.replaceAll(punctuation, "").replace(" ", "");
 		return text.length();
 	}
 
-	private double calc_std(List<CALCBean> list) {
+	protected double calc_std(List<CALCBean> list) {
 		double total = 0;
 		for(CALCBean bean:list) {
 			total += bean.getDensity();
@@ -153,7 +123,7 @@ public class ContentExtractor {
 //		System.out.println(std);
 		return std;
 	}
-	private void calc_new_score(List<CALCBean> list,double std ) {
+	protected void calc_new_score(List<CALCBean> list,double std ) {
 		double score = 0.0f;
 		for(CALCBean bean:list) {
 			if(bean.getDensity() != 0 && bean.getSbdi() !=0) {
@@ -168,11 +138,11 @@ public class ContentExtractor {
 			bean.setScore(score);
 		}
 	}
-	private String getAllTextOfElement(Element ele) {
+	protected String getAllTextOfElement(Element ele) {
 		return ele.text();
 	}
 	
-	private String getAllTextOfElement(Elements ele) {
+	protected String getAllTextOfElement(Elements ele) {
 		StringBuffer sb = new StringBuffer();
 		for(Element eleChild:ele) {
 			sb.append(eleChild.text());
@@ -180,7 +150,7 @@ public class ContentExtractor {
 		return sb.toString();
 		
 	}
-	private int count_text_tag(Element ele) {
+	protected int count_text_tag(Element ele) {
 		int result = ele.select("p").size();
 		if(ele.tagName() == "p") {
 			result --;
@@ -201,9 +171,7 @@ public class ContentExtractor {
 		int ltgi;
 		int sbi;
 		
-		
-		
-
+	
 		public int getSbi() {
 			return sbi;
 		}
