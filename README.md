@@ -6,6 +6,9 @@ java 版实现新闻内容自动抓取
 python 原版 https://github.com/kingname/GeneralNewsExtractor/
 
 程序采用okhttp/htmlunit + jsoup /正则表达式 三方jar
+如果有ajax请求，使用htmlunit,
+没有ajax请求，使用okhttp就可以。
+支持截取标签的记录，修改。使用md5把url作为文件名，如果存在记录文件，优先使用文件中的标签。
 
 # 运行
 
